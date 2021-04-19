@@ -36,26 +36,61 @@
         android:id="@+id/getImg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Get Images"
+        android:text="Get Images by folders"
         app:layout_constraintBottom_toTopOf="@+id/getAudio"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toStartOf="@+id/getAllImgs"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rec" />
 
     <Button
         android:id="@+id/getVideo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Get Videos"
+        android:text="Get Videos by folders"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toEndOf="@+id/getAudio"
+        app:layout_constraintStart_toStartOf="@+id/getAudio"
+        app:layout_constraintTop_toBottomOf="@+id/getAudio" />
 
     <Button
         android:id="@+id/getAudio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Get Audios"
+        android:text="Get Audios by folders"
         app:layout_constraintBottom_toTopOf="@+id/getVideo"
+        app:layout_constraintEnd_toEndOf="@+id/getImg"
+        app:layout_constraintStart_toStartOf="@+id/getImg"
+        app:layout_constraintTop_toBottomOf="@+id/getImg" />
+
+    <Button
+        android:id="@+id/getAllImgs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Get All Images"
+        app:layout_constraintBottom_toTopOf="@+id/getAllAudios"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/getImg"
+        app:layout_constraintTop_toTopOf="@+id/getImg" />
+
+    <Button
+        android:id="@+id/getAllVideos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Get All vidoes"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/getAllAudios"
+        app:layout_constraintStart_toStartOf="@+id/getAllAudios"
+        app:layout_constraintTop_toBottomOf="@+id/getAllAudios" />
+
+    <Button
+        android:id="@+id/getAllAudios"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="get all Audio"
+        app:layout_constraintBottom_toTopOf="@+id/getAllVideos"
+        app:layout_constraintEnd_toEndOf="@+id/getAllImgs"
+        app:layout_constraintStart_toStartOf="@+id/getAllImgs"
+        app:layout_constraintTop_toBottomOf="@+id/getAllImgs" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -77,7 +77,7 @@ object FileUtils {
                     // Cache column indices.
                     val idColumn: Int =
                         cursor?.getColumnIndexOrThrow(MediaStore.Video.Media._ID) ?: 0
-                    var uri = when (type) {
+                    val uri = when (type) {
                         UriType.VIDEO_URL -> {
                             MediaStore.Video.Media.EXTERNAL_CONTENT_URI
                         }
@@ -99,7 +99,8 @@ object FileUtils {
 
                         // Stores column values and the contentUri in a local object
                         // that represents the media file.
-                        contentUri.path?.let { fileList.add(it) }
+
+                        contentUri.toString()?.let { fileList.add(it) }
                     }
                 }
                 withContext(Dispatchers.Main) {

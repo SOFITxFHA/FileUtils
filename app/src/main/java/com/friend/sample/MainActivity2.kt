@@ -1,7 +1,10 @@
 package com.friend.sample
 
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -22,6 +25,9 @@ class MainActivity2 : AppCompatActivity() {
         binding= ActivityMain2Binding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.title=intent?.getStringExtra("parent")
+        supportActionBar?.setHomeButtonEnabled(true)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
         binding.rec.adapter=VideoShowAdapder2(Common.listOfFile)
     }
 
@@ -42,12 +48,21 @@ class MainActivity2 : AppCompatActivity() {
         }
 
         override fun onBindViewHolder(holder: MyHolder, position: Int) {
-
+Log.d("gg" ,listOfData?.get(holder.adapterPosition) )
             Glide.with(this@MainActivity2).load(listOfData?.get(holder.adapterPosition))
                 .placeholder(R.drawable.imageplaceholder).into(holder.view.imageView2)
             CoroutineScope(Dispatchers.Default).launch {
-                val file = File(listOfData?.get(holder.adapterPosition))
-                val size = file.length().getFileSize()
+                val file = File(listOfData?.get(position))
+                Log.d("length" , file.length().toString())
+                var size=""
+                size = if(file.length().toString()=="0"){
+                    val path=Utill.getPath(this@MainActivity2,Uri.parse(listOfData?.get(position)))
+                    val f=File(path)
+                    f.length().getFileSize()
+                } else{
+                    file.length().getFileSize()
+                }
+
                 withContext(Dispatchers.Main) {
                     holder.view.textView2.text = size
                 }
@@ -65,5 +80,14 @@ class MainActivity2 : AppCompatActivity() {
         override fun getItemCount(): Int {
             return listOfData?.size?:0
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            android.R.id.home->{
+                onBackPressed()
+            }
+        }
+        return true
     }
 }
