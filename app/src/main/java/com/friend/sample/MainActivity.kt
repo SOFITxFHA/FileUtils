@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.file.fileutils.*
+import com.friend.sample.ExtensionFun.getFileSize
 import com.friend.sample.ExtensionFun.hide
 import com.friend.sample.ExtensionFun.visible
 import com.friend.sample.databinding.ActivityMainBinding
@@ -36,6 +37,18 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         onClickEvent()
+
+
+        FileUtils.getAvailableExternalMemorySize(object : GetStorageStateCallBack {
+            override fun onSuccess(total: Long, available: Long) {
+                binding.totalStr.text = total.getFileSize()
+                binding.avaStorage.text = available.getFileSize()
+            }
+
+            override fun onFailure(ex: java.lang.Exception) {
+
+            }
+        })
     }
 
 

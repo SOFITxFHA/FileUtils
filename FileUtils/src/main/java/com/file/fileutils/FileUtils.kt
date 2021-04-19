@@ -5,14 +5,14 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.os.StatFs
 import android.provider.MediaStore
 import android.util.Log
 import com.file.fileutils.Extension.getFolderSize
 import kotlinx.coroutines.*
 import java.io.File
-import java.lang.Exception
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
+import java.lang.NullPointerException
+
 
 object FileUtils {
 
@@ -21,7 +21,7 @@ object FileUtils {
     val listOfFilesFromFolder: ArrayList<String> = ArrayList()
     val listOfEmptyFolders: ArrayList<String> = ArrayList()
     val listOfCache: ArrayList<String> = ArrayList()
-    val listOfGroupedFiles: HashMap<String , ArrayList<String>?> = HashMap()
+    val listOfGroupedFiles: HashMap<String, ArrayList<String>?> = HashMap()
 
 // Get Files
     fun getFiles(context: Context, type: UriType, callback: Callback) {
@@ -203,7 +203,10 @@ object FileUtils {
 
 
                         listOfFilesFromFolder.add(listFile[i].absolutePath)
-                        Log.d("file " , listOfFilesFromFolder.size.toString()+" "+listFile[i].path)
+                        Log.d(
+                            "file ",
+                            listOfFilesFromFolder.size.toString() + " " + listFile[i].path
+                        )
                     }
                 }
 
@@ -328,8 +331,8 @@ object FileUtils {
             // we are empty, add us.
             if(dir.name=="cache"){
 
-                if(File(dir.path +"/cache").getFolderSize()>0){
-                    listOfCache.add(dir.absolutePath+"/cache")
+                if(File(dir.path + "/cache").getFolderSize()>0){
+                    listOfCache.add(dir.absolutePath + "/cache")
                 }
 
 
@@ -343,8 +346,8 @@ object FileUtils {
         for (content in folderContents) {
             // Disregard files, acquire folders
             if (content.isDirectory && content.name=="cache") {
-                if(File(dir.path +"/cache").getFolderSize()>0) {
-                    listOfCache.add(dir.absolutePath+"/cache")
+                if(File(dir.path + "/cache").getFolderSize()>0) {
+                    listOfCache.add(dir.absolutePath + "/cache")
                 }
             }
             else{
@@ -356,30 +359,34 @@ object FileUtils {
     }
 
 
-    fun getGroupedFolderFiles(rootDir: File,fileExtension: UriType,callback: FileGroupedCallback){
+    fun getGroupedFolderFiles(rootDir: File, fileExtension: UriType, callback: FileGroupedCallback){
         listOfGroupedFiles.clear()
         CoroutineScope(Dispatchers.Default).launch {
             try {
 
                 val listOfExternsion:ArrayList<String> = ArrayList()
                 when(fileExtension){
-                    UriType.VIDEO_URL->{
+                    UriType.VIDEO_URL -> {
 
                         listOfExternsion.add("mp4")
 
                     }
-                    UriType.IMAGE_URL->{
+                    UriType.IMAGE_URL -> {
                         listOfExternsion.add("png")
                         listOfExternsion.add("jpeg")
                         listOfExternsion.add("jpg")
                         listOfExternsion.add("svg")
                     }
-                    UriType.AUDIO_URL->{
+                    UriType.AUDIO_URL -> {
                         listOfExternsion.add("mp3")
 
                     }
                 }
-                getGroupedFolderFiles2(Environment.getExternalStorageDirectory(),fileExtension,listOfExternsion)
+                getGroupedFolderFiles2(
+                    Environment.getExternalStorageDirectory(),
+                    fileExtension,
+                    listOfExternsion
+                )
 
 
                 withContext(Dispatchers.Main) {
@@ -459,6 +466,32 @@ object FileUtils {
             throw ex
         }
     }
+
+
+     fun getAvailableExternalMemorySize(callBack: GetStorageStateCallBack) {
+         CoroutineScope(Dispatchers.Default).launch {
+             if (externalMemoryAvailable()) {
+                 val path = Environment.getExternalStorageDirectory()
+                 val stat = StatFs(path.path)
+                 val blockSize = stat.blockSizeLong
+                 val availableBlocks = stat.availableBlocksLong
+                 val totalBlock = stat.blockCountLong
+                 callBack.onSuccess(totalBlock * blockSize , availableBlocks * blockSize)
+
+             }
+             else{
+                 callBack.onFailure(throw NullPointerException())
+             }
+         }
+
+    }
+
+    fun externalMemoryAvailable(): Boolean {
+        return Environment.getExternalStorageState() ==
+                Environment.MEDIA_MOUNTED
+    }
+
+
 
 }
 

@@ -16,4 +16,8 @@ interface FileGroupedCallback{
     public abstract fun onFailure(ex: Exception)
 }
 
+interface GetStorageStateCallBack{
+    public abstract fun onSuccess(total:Long , available:Long)
 
+    public abstract fun onFailure(ex: Exception)
+}
