@@ -48,7 +48,7 @@ class MainActivity2 : AppCompatActivity() {
         }
 
         override fun onBindViewHolder(holder: MyHolder, position: Int) {
-Log.d("gg" ,listOfData?.get(holder.adapterPosition) )
+
             Glide.with(this@MainActivity2).load(listOfData?.get(holder.adapterPosition))
                 .placeholder(R.drawable.imageplaceholder).into(holder.view.imageView2)
             CoroutineScope(Dispatchers.Default).launch {

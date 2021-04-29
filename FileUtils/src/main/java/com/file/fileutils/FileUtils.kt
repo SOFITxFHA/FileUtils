@@ -8,6 +8,7 @@ import android.os.Environment
 import android.os.StatFs
 import android.provider.MediaStore
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.file.fileutils.Extension.getFolderSize
 import kotlinx.coroutines.*
 import java.io.File
@@ -22,6 +23,7 @@ object FileUtils {
     val listOfEmptyFolders: ArrayList<String> = ArrayList()
     val listOfCache: ArrayList<String> = ArrayList()
     val listOfGroupedFiles: HashMap<String, ArrayList<String>?> = HashMap()
+    val listOfGroupedAllFiles: ArrayList<String?> = ArrayList()
 
 // Get Files
     fun getFiles(context: Context, type: UriType, callback: Callback) {
@@ -467,8 +469,64 @@ object FileUtils {
         }
     }
 
+  @RequiresApi(Build.VERSION_CODES.Q)
+  fun getFilesFromDownload(context: Context,callback: SpecificFolderFileCallback)
+  {
+      CoroutineScope(Dispatchers.Default).launch {
+          try {
 
-     fun getAvailableExternalMemorySize(callBack: GetStorageStateCallBack) {
+
+              val fileList: ArrayList<String> = ArrayList()
+              val collection: Uri =  MediaStore.Downloads.EXTERNAL_CONTENT_URI
+              val projection = arrayOf(
+                  MediaStore.Video.Media._ID
+
+              )
+
+              val sortOrder = MediaStore.Video.Media.SIZE + " DESC"
+              context.contentResolver.query(
+                  collection,
+                  projection,
+                  null,
+                  null,
+                  sortOrder
+              ).use { cursor ->
+                  // Cache column indices.
+                  val idColumn: Int =
+                      cursor?.getColumnIndexOrThrow(MediaStore.Video.Media._ID) ?: 0
+
+                  while (cursor?.moveToNext() == true) {
+                      // Get values of columns for a given video.
+                      val id: Long = cursor.getLong(idColumn)
+
+
+                      val contentUri = ContentUris.withAppendedId(
+                          collection, id
+                      )
+
+                      // Stores column values and the contentUri in a local object
+                      // that represents the media file.
+
+                      contentUri.toString()?.let { fileList.add(it) }
+
+                      val path=Utill.getPath(context , contentUri)
+                    listOfGroupedAllFiles.add(path)
+                  }
+
+              }
+              withContext(Dispatchers.Main) {
+                  callback.onSuccess(listOfGroupedAllFiles)
+              }
+          } catch (ex: Exception) {
+              withContext(Dispatchers.Main) {
+                  callback.onFailure(ex)
+              }
+          }
+
+      }
+    }
+
+    fun getAvailableExternalMemorySize(callBack: GetStorageStateCallBack) {
          CoroutineScope(Dispatchers.Default).launch {
              if (externalMemoryAvailable()) {
                  val path = Environment.getExternalStorageDirectory()

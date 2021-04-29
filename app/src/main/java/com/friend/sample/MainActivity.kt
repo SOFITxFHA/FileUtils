@@ -3,8 +3,12 @@ package com.friend.sample
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+
+import android.provider.Settings
+
 import android.util.Log
 import android.view.ViewGroup
 import android.widget.Toast
@@ -13,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.file.fileutils.*
+import com.file.fileutils.FileUtils.getFilesFromDownload
 import com.friend.sample.ExtensionFun.getFileSize
 import com.friend.sample.ExtensionFun.hide
 import com.friend.sample.ExtensionFun.visible
@@ -29,6 +34,10 @@ class MainActivity : AppCompatActivity() {
                 binding.progressBar.visible()
                 getFIles(type)
             }
+        }
+    var askForAllFileAccessPermission =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,8 +58,36 @@ class MainActivity : AppCompatActivity() {
 
             }
         })
+
+
+
+
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (!Environment.isExternalStorageManager()) {
+            val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+            val uri = Uri.fromParts("package", packageName, null)
+            intent.data = uri
+            askForAllFileAccessPermission.launch(intent)
+
+        } else {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                getFilesFromDownload(this@MainActivity,object : SpecificFolderFileCallback {
+                    override fun onSuccess(data: ArrayList<String?>) {
+                            data?.forEach {
+                                Log.d("path " , it.toString())
+                            }
+                    }
+
+                    override fun onFailure(ex: java.lang.Exception) {
+
+                    }
+                })
+            }
+        }
+    }
 
     fun onClickEvent() {
         binding.getImg.setOnClickListener {
